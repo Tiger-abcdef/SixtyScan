@@ -5,7 +5,6 @@ import librosa
 import matplotlib.pyplot as plt
 import librosa.display
 import soundfile as sf
-import pydub
 from pydub import AudioSegment
 from PIL import Image
 import torch
