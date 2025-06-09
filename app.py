@@ -82,6 +82,9 @@ def predict(tensor):
 # =============================
 mode = st.radio("เลือกโหมด (Select mode):", ["Sample Mode", "Inference Mode"], index=1, horizontal=True)
 
+# =============================
+# Sample Mode
+# =============================
 if mode == "Sample Mode":
     st.sidebar.title("เลือกสเปกโตรแกรมตัวอย่าง")
     EXAMPLE_DIR = "exampleSpectrogram"
@@ -90,6 +93,73 @@ if mode == "Sample Mode":
     if selected_example:
         image_path = os.path.join(EXAMPLE_DIR, selected_example)
         st.image(Image.open(image_path), caption=selected_example)
+
+        # Predict sample button
+        if st.button("🔍 Predict Sample"):
+            img = Image.open(image_path).convert("RGB")
+            tensor = preprocess(img).unsqueeze(0)
+            prob = predict(tensor)
+            percent = int(prob * 100)
+
+            # Determine level and advice styling
+            if percent <= 50:
+                level = "ระดับต่ำ (Low)"
+                label = "Non Parkinson"
+                diagnosis = "ไม่เป็นพาร์กินสัน"
+                box_color = "#e6f9e6"
+                advice = """
+                <div style='text-align: left;'>
+                <p><b>คำแนะนำ:</b></p>
+                <ul style='padding-left: 20px;'>
+                    <li>ไม่มีอาการ: ควรตรวจปีละครั้ง</li>
+                    <li>อาการเล็กน้อย (เช่น การเปลี่ยนแปลงเสียงเล็กน้อย อาการสั่นเล็กน้อย): ควรตรวจปีละ 2 ครั้ง</li>
+                    <li>อาการเตือน (เช่น ส่งผลต่อการเคลื่อนไหว/การทำงานในแต่ละวัน): ควรตรวจ 2–4 ครั้งต่อปี</li>
+                </ul>
+                </div>
+                """
+            elif percent <= 75:
+                level = "ปานกลาง (Moderate)"
+                label = "Parkinson"
+                diagnosis = "เป็นพาร์กินสัน"
+                box_color = "#fff7e6"
+                advice = """
+                <div style='text-align: left;'>
+                <p><b>คำแนะนำ:</b></p>
+                <ul style='padding-left: 20px;'>
+                    <li>ควรพบแพทย์เฉพาะทางระบบประสาท</li>
+                    <li>ควรบันทึกอาการในแต่ละวัน</li>
+                    <li>หากได้รับยา: ควรบันทึกผลข้างเคียงและประสิทธิภาพของยา</li>
+                </ul>
+                </div>
+                """
+            else:
+                level = "สูง (High)"
+                label = "Parkinson"
+                diagnosis = "เป็นพาร์กินสัน"
+                box_color = "#ffe6e6"
+                advice = """
+                <div style='text-align: left;'>
+                <p><b>คำแนะนำ:</b></p>
+                <ul style='padding-left: 20px;'>
+                    <li>ควรพบแพทย์เฉพาะทางระบบประสาทโดยเร็วที่สุด</li>
+                    <li>ควรบันทึกอาการในแต่ละวัน</li>
+                    <li>หากได้รับยา: ควรบันทึกผลข้างเคียงและผลลัพธ์ของยา</li>
+                </ul>
+                </div>
+                """
+
+            st.markdown(f"""
+                <div style='background-color:{box_color}; padding: 20px; border-radius: 10px; font-size: 18px; color: #000000;'>
+                    <div style='text-align: center; font-size: 26px; font-weight: bold; margin-bottom: 12px;'>{label}:</div>
+                    <h3 style='text-align: left;'>ระดับความน่าจะเป็น: {level}</h3>
+                    <h3 style='text-align: left;'>ความน่าจะเป็นของพาร์กินสัน: {percent}%</h3>
+                    <div style='height: 28px; background: linear-gradient(to right, green, yellow, red); border-radius: 6px; margin-bottom: 12px; position: relative;'>
+                        <div style='position: absolute; left: {percent}%; top: 0; bottom: 0; width: 3px; background-color: black;'></div>
+                    </div>
+                    <h3 style='text-align: left;'>ผลการวิเคราะห์: {diagnosis}</h3>
+                    {advice}
+                </div>
+            """, unsafe_allow_html=True)
 
 # =============================
 # Inference Mode
@@ -113,7 +183,6 @@ if mode == "Inference Mode":
             <li>เมื่ออัปโหลดครบแล้ว ให้กดปุ่ม Predict</li>
         </ul>
     """, unsafe_allow_html=True)
-
 
     uploaded_files = st.file_uploader("อัปโหลดไฟล์เสียง (wav/mp3/aac/m4a)", type=["wav", "mp3", "aac", "m4a"], accept_multiple_files=True)
 
