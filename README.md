@@ -6,6 +6,8 @@ This project aims to detect Parkinson’s Disease from short voice recordings us
 
 ## Project Overview
 
-The system uses a CNN-based model (ResNet18) to classify voice data into two classes: Parkinson’s Disease (PD) and Non-PD. The system uses mel spectrograms and a ResNet-based CNN classifier to evaluate vocal impairments associated with PD, supporting early detection and digital health screening. (This is a student project, not an official medical tool)
+The system uses a CNN-based model (ResNet18) to classify voice data into two classes: Parkinson’s Disease (PD) and Non-PD. The system uses mel spectrograms and a ResNet-based CNN classifier to evaluate vocal impairments associated with PD, supporting early detection and digital health screening. 
+
+(This is a student project, not an official medical tool)
 
 ---
